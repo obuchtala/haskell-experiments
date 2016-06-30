@@ -1,5 +1,4 @@
 {-
-  Example 1
   A non-deterministic monadic implementation of a flow of actions.
   Using the Maybe monad you can write a chain of operations.
   If at some point the result is turned into Nothing the monad will not propagate
