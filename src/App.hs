@@ -14,23 +14,23 @@ import qualified Action as A
 data State = State Page Role
   deriving (Show)
 
-performAction :: Action -> State -> Maybe State
+performAction :: Action -> State -> Either String State
 
 -- Authenticate
 performAction (A.Authenticate userId token) (State page _)
-  | isJust(role)  = Just (State page (fromJust role))
-  | otherwise     = Just (State page R.Guest)
+  | isJust(role)  = Right (State page (fromJust role))
+  | otherwise     = Left "Authentication failed"
   where
     role = (_authenticate userId token)
 
 -- OpenDashboard
-performAction (A.OpenDashboard) s@(State P.Dashboard _) = Just s
-performAction (A.OpenDashboard) s@(State _ r) = Just (State P.Dashboard r)
+performAction (A.OpenDashboard) s@(State P.Dashboard _) = Right s
+performAction (A.OpenDashboard) s@(State _ r) = Right (State P.Dashboard r)
 
 -- OpenDocument
 performAction (A.OpenDocument documentId) s@(State _ r)
-  | authorized = Just (State (P.Document documentId) r)
-  | otherwise = Nothing
+  | authorized = Right (State (P.Document documentId) r)
+  | otherwise = Left "Access denied"
   where
     authorized = (_authorize documentId r)
 
